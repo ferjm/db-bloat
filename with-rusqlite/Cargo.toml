@@ -1,0 +1,7 @@
+[package]
+name = "with-rusqlite"
+version = "0.1.0"
+authors = ["Fernando Jiménez Moreno <ferjmoreno@gmail.com>"]
+
+[dependencies]
+rusqlite = "0.13.0"
