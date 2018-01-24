@@ -14,14 +14,13 @@ fn main() {
                   id              INTEGER PRIMARY KEY,
                   name            TEXT NOT NULL
                   )", &[]).unwrap();
-    let me = Person {
-        id: 0,
-        name: "Yo".to_string()
-    };
-    conn.execute("INSERT INTO person (name) VALUES (?1)",
-                 &[&me.name]).unwrap();
+    let beatles = vec!["John", "Paul", "George", "Ringo"];
+    for beatle in beatles.iter() {
+        conn.execute("INSERT INTO person (name) VALUES (?1)",
+                     &[beatle]).unwrap();
+    }
 
-    let mut stmt = conn.prepare("SELECT id, name FROM person").unwrap();
+    let mut stmt = conn.prepare("SELECT * FROM person").unwrap();
     let person_iter = stmt.query_map(&[], |row| {
         Person {
             id: row.get(0),
@@ -30,7 +29,16 @@ fn main() {
     }).unwrap();
 
     for person in person_iter {
-        println!("Found person {:?}", person.unwrap().name);
+        println!("Found person {}", person.unwrap().name);
     }
+
+    let mut stmt = conn.prepare("SELECT * FROM person WHERE name=\"John\" LIMIT 1").unwrap();
+    let person = stmt.query_map(&[], |row| {
+        Person {
+            id: row.get(0),
+            name: row.get(1),
+        }
+    }).unwrap().next().unwrap().unwrap();
+    println!("Found person {}", person.name);
 }
 

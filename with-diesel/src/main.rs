@@ -19,19 +19,29 @@ fn main() {
 
     embedded_migrations::run_with_output(&connection, &mut std::io::stdout()).unwrap();
 
-    let me = NewPerson {
-        name: "Yo",
-        data: None
-    };
-
-    diesel::insert_into(persons::table)
-        .values(&me)
-        .execute(&connection)
-        .expect("Error saving person");
+    let beatles = vec!["John", "Paul", "George", "Ringo"];
+    for beatle in beatles.iter() {
+        let person = NewPerson {
+            name: beatle
+        };
+        diesel::insert_into(persons::table)
+            .values(&person)
+            .execute(&connection)
+            .expect("Error saving person");
+    }
 
     let results = persons.load::<Person>(&connection).expect("Error loading persons");
 
     for person in results {
-        println!("Found person {:?}", person.name);
+        println!("Found person {}", person.name);
+    }
+
+    let results = persons.filter(name.eq("John"))
+                         .limit(1)
+                         .load::<Person>(&connection)
+                         .expect("Error loading persons");
+
+    for person in results {
+        println!("Found person {}", person.name);
     }
 }
